@@ -290,9 +290,13 @@ public class MangaDownloader implements Logger {
 			do {
 				mangaCount = 0;
 				try {
+					String requestUrl = mainUrl + "&page=" + pageNr;
+					System.out.println("request: " + requestUrl);
+
 					final BufferedReader reader = new BufferedReader(
-							new InputStreamReader(openUrlInputStream(mainUrl
-									+ "&page=" + pageNr), CHARSET_UTF8));
+							new InputStreamReader(
+									openUrlInputStream(requestUrl),
+									CHARSET_UTF8));
 					String line;
 					while (null != (line = reader.readLine())) {
 						if (line.contains("Your IP")) {
@@ -307,6 +311,8 @@ public class MangaDownloader implements Logger {
 								if (isNotEmptyOrNull(mangaUrl)) {
 									String mangaId = substringBetween(mangaUrl,
 											"/g/", "/");
+									System.out.println(mangaId + ": "
+											+ mangaUrl);
 									if (downloadedIds.contains(mangaId)) {
 										log.log("跳过漫画册（已下载）：" + mangaId);
 										mangaCount++;
@@ -346,6 +352,7 @@ public class MangaDownloader implements Logger {
 						}
 					}
 					reader.close();
+					Thread.sleep(10000 + (int) (Math.random() * 10000));
 				} catch (Exception e) {
 					e.printStackTrace();
 					log.err("错误：" + e.toString());
