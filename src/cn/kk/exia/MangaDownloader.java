@@ -40,7 +40,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,57 +48,42 @@ import java.util.Map;
 import java.util.Set;
 
 public class MangaDownloader implements Logger {
-	private static String targetDir = "D:\\temp";
+	private static String											targetDir							= "D:\\temp";
 
-	private static final Map<String, String> DEFAULT_CONN_HEADERS = new HashMap<String, String>();
+	private static final Map<String, String>	DEFAULT_CONN_HEADERS	= new HashMap<String, String>();
 
-	public static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
+	public static final Charset								CHARSET_UTF8					= Charset.forName("UTF-8");
 	static {
 		System.setProperty("http.keepAlive", "false");
-		CookieHandler.setDefault(new CookieManager(null,
-				CookiePolicy.ACCEPT_ALL));
+		CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 		HttpURLConnection.setFollowRedirects(false);
 		resetConnectionHeaders();
 	}
 
-	private static int lineCounter = 0;
+	private static int												lineCounter						= 0;
 
-	private static StringBuffer cookie = new StringBuffer(512);
+	private static StringBuffer								cookie								= new StringBuffer(512);
 
-	public static final int BUFFER_SIZE = 1024 * 1024 * 4;
-
-	private static final ByteBuffer IO_BB = ByteBuffer
-			.wrap(new byte[BUFFER_SIZE]);
-
-	private static String analyzeLine(String line, int num, Logger log,
-			boolean first) {
-		String title = substringBetweenNarrow(line, "<h1>", "</h1>");
-		if (isNotEmptyOrNull(title)) {
+	private static String analyzeLine(String line, int num, Logger log, boolean first) {
+		String title = Helper.substringBetweenNarrow(line, "<h1>", "</h1>");
+		if (Helper.isNotEmptyOrNull(title)) {
 			title = title.replace('/', '_').replace('?', '_').replace('*', '_');
 			File dir = new File(targetDir + File.separator + title);
 			if (first) {
 				log.log("漫画册名称：" + title);
 			}
 			dir.mkdirs();
-			String nextUrl = substringBetweenNarrow(line, "<a href=\"", "-"
-					+ num + "\"><img");
-			if (isNotEmptyOrNull(nextUrl)) {
+			String nextUrl = Helper.substringBetweenNarrow(line, "<a href=\"", "-" + num + "\"><img");
+			if (Helper.isNotEmptyOrNull(nextUrl)) {
 				nextUrl += "-" + num;
-				String img = substringBetweenNarrow(
-						line.substring(line.indexOf("<iframe")), "<img src=\"",
-						"\" style=\"");
-				if (isNotEmptyOrNull(img)) {
+				String img = Helper.substringBetweenNarrow(line.substring(line.indexOf("<iframe")), "<img src=\"", "\" style=\"");
+				if (Helper.isNotEmptyOrNull(img)) {
 					try {
-						String imgName = img.substring(img.lastIndexOf('/'))
-								.replace('/', '_').replace('?', '_')
-								.replace('*', '_');
+						String imgName = img.substring(img.lastIndexOf('/')).replace('/', '_').replace('?', '_').replace('*', '_');
 						if (imgName.indexOf('=') != -1) {
-							imgName = imgName.substring(imgName
-									.lastIndexOf('=') + 1);
+							imgName = imgName.substring(imgName.lastIndexOf('=') + 1);
 						}
-						if (null != download(img,
-								new File(dir, imgName).getAbsolutePath(),
-								false, log)) {
+						if (null != download(img, new File(dir, imgName).getAbsolutePath(), false, log)) {
 							log.log("图片下载成功：" + img);
 							try {
 								if (lineCounter++ >= 5) {
@@ -132,8 +116,7 @@ public class MangaDownloader implements Logger {
 		return null;
 	}
 
-	public static final boolean appendCookies(final StringBuffer cookie,
-			final HttpURLConnection conn) {
+	public static final boolean appendCookies(final StringBuffer cookie, final HttpURLConnection conn) {
 		boolean changed = false;
 		List<String> values = conn.getHeaderFields().get("Set-Cookie");
 		if (values != null) {
@@ -150,16 +133,14 @@ public class MangaDownloader implements Logger {
 		return changed;
 	}
 
-	private static void appendUrl(File downloaded, String mangaUrl)
-			throws IOException {
+	private static void appendUrl(File downloaded, String mangaUrl) throws IOException {
 		FileWriter f = new FileWriter(downloaded, true);
 		f.write(mangaUrl);
 		f.write('\n');
 		f.close();
 	}
 
-	public static String download(String url, String to, boolean overwrite,
-			Logger log) throws IOException {
+	public static String download(String url, String to, boolean overwrite, Logger log) throws IOException {
 		final File toFile = new File(to);
 		if (!overwrite && toFile.exists() && toFile.length() > 0) {
 			return null;
@@ -169,7 +150,7 @@ public class MangaDownloader implements Logger {
 			try {
 				out = new BufferedOutputStream(new FileOutputStream(to));
 				in = new BufferedInputStream(openUrlInputStream(url));
-				write(in, out);
+				Helper.write(in, out);
 			} catch (IOException e) {
 				toFile.delete();
 				e.printStackTrace();
@@ -187,18 +168,14 @@ public class MangaDownloader implements Logger {
 		}
 	}
 
-	public static boolean downloadGallery(String mangaUrl, String targetDir,
-			Logger log) {
+	public static boolean downloadGallery(String mangaUrl, String targetDir, Logger log) {
 		try {
-			final BufferedReader reader = new BufferedReader(
-					new InputStreamReader(openUrlInputStream(mangaUrl),
-							CHARSET_UTF8));
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(openUrlInputStream(mangaUrl), CHARSET_UTF8));
 			String line;
 			while (null != (line = reader.readLine())) {
 				if (line.contains("<h1")) {
-					String pageUrl = substringBetweenNarrow(line, "<a href=\"",
-							"-1\">");
-					if (isNotEmptyOrNull(pageUrl)) {
+					String pageUrl = Helper.substringBetweenNarrow(line, "<a href=\"", "-1\">");
+					if (Helper.isNotEmptyOrNull(pageUrl)) {
 						pageUrl += "-1";
 						downloadManga(pageUrl, targetDir, log);
 						return true;
@@ -224,9 +201,7 @@ public class MangaDownloader implements Logger {
 				String substring = url.substring(url.lastIndexOf('-') + 1);
 				int num = Integer.parseInt(substring);
 				try {
-					final BufferedReader reader = new BufferedReader(
-							new InputStreamReader(openUrlInputStream(url),
-									CHARSET_UTF8));
+					final BufferedReader reader = new BufferedReader(new InputStreamReader(openUrlInputStream(url), CHARSET_UTF8));
 					String line;
 					while (null != (line = reader.readLine())) {
 						if (line.contains("<h1>")) {
@@ -263,14 +238,12 @@ public class MangaDownloader implements Logger {
 		}
 	}
 
-	public static void downloadSearchResult(String keyword, String targetDir,
-			Logger log) {
+	public static void downloadSearchResult(String keyword, String targetDir, Logger log, boolean[] optionsTypes, boolean[] optionsSearchFields, int minimumStars) {
 		int pageNr = 0;
 		int mangaCount;
 		File dir = new File(targetDir);
 		dir.mkdirs();
-		File downloaded = new File(targetDir + File.separator
-				+ "md-downloaded.txt");
+		File downloaded = new File(targetDir + File.separator + "md-downloaded.txt");
 		Set<String> downloadedIds = new HashSet<String>();
 		if (downloaded.isFile()) {
 			try {
@@ -281,11 +254,8 @@ public class MangaDownloader implements Logger {
 			}
 		}
 
-		String mainUrl = null;
 		try {
-			mainUrl = "http://g.e-hentai.org/?f_doujinshi=on&f_manga=on&f_asianporn=on&f_search="
-					+ URLEncoder.encode(keyword, CHARSET_UTF8.name())
-					+ "&f_srdd=5&f_sfdd=favall&f_sname=on&f_stags=on&f_sr=on&f_apply=Apply+Filter";
+			String mainUrl = createMainUrl(keyword, optionsTypes, optionsSearchFields, minimumStars);
 
 			do {
 				mangaCount = 0;
@@ -293,10 +263,7 @@ public class MangaDownloader implements Logger {
 					String requestUrl = mainUrl + "&page=" + pageNr;
 					System.out.println("request: " + requestUrl);
 
-					final BufferedReader reader = new BufferedReader(
-							new InputStreamReader(
-									openUrlInputStream(requestUrl),
-									CHARSET_UTF8));
+					final BufferedReader reader = new BufferedReader(new InputStreamReader(openUrlInputStream(requestUrl), CHARSET_UTF8));
 					String line;
 					while (null != (line = reader.readLine())) {
 						if (line.contains("Your IP")) {
@@ -306,13 +273,10 @@ public class MangaDownloader implements Logger {
 							String[] split = line.split("imgicon.png");
 							for (int i = 1; i < split.length; i++) {
 								String mangaUrl = split[i];
-								mangaUrl = substringBetween(mangaUrl,
-										"<div class=\"it1\"><a href=\"", "\">");
-								if (isNotEmptyOrNull(mangaUrl)) {
-									String mangaId = substringBetween(mangaUrl,
-											"/g/", "/");
-									System.out.println(mangaId + ": "
-											+ mangaUrl);
+								mangaUrl = Helper.substringBetween(mangaUrl, "<div class=\"it1\"><a href=\"", "\">");
+								if (Helper.isNotEmptyOrNull(mangaUrl)) {
+									String mangaId = Helper.substringBetween(mangaUrl, "/g/", "/");
+									System.out.println(mangaId + ": " + mangaUrl);
 									if (downloadedIds.contains(mangaId)) {
 										log.log("跳过漫画册（已下载）：" + mangaId);
 										mangaCount++;
@@ -322,18 +286,15 @@ public class MangaDownloader implements Logger {
 										boolean success = false;
 										int retries = 0;
 										while (retries++ < 4 && !success) {
-											if (downloadGallery(mangaUrl,
-													targetDir, log)) {
+											if (downloadGallery(mangaUrl, targetDir, log)) {
 												mangaCount++;
 												downloadedIds.add(mangaId);
 												appendUrl(downloaded, mangaId);
 												success = true;
 											} else {
-												log.log("下载暂停。服务器阻止下载："
-														+ mangaUrl);
+												log.log("下载暂停。服务器阻止下载：" + mangaUrl);
 												try {
-													Thread.sleep(60000 * 4 + (int) (Math
-															.random() * 10000));
+													Thread.sleep(60000 * 4 + (int) (Math.random() * 10000));
 												} catch (Exception e) {
 													e.printStackTrace();
 													log.err(e.toString());
@@ -341,8 +302,7 @@ public class MangaDownloader implements Logger {
 											}
 										}
 										if (!success) {
-											log.err("下载中断（没有找到漫画页，请下载或等待最新软件）："
-													+ mangaUrl);
+											log.err("下载中断（没有找到漫画页，请下载或等待最新软件）：" + mangaUrl);
 											return;
 										}
 									}
@@ -359,20 +319,83 @@ public class MangaDownloader implements Logger {
 				}
 				pageNr++;
 			} while (mangaCount > 0);
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			log.err("错误：" + e.toString());
 		}
 	}
 
-	public final static HttpURLConnection getUrlConnection(final String url)
-			throws MalformedURLException, IOException {
+	private static String createMainUrl(String keyword, boolean[] optionsTypes, boolean[] optionsSearchFields, int minimumStars)
+			throws UnsupportedEncodingException {
+		StringBuffer url = new StringBuffer(200);
+		url.append("http://g.e-hentai.org/?");
+		url.append("f_search=").append(URLEncoder.encode(keyword, CHARSET_UTF8.name()));
+		if (minimumStars > 1) {
+			url.append("&f_sr=on&f_srdd=").append(String.valueOf(minimumStars));
+		}
+		for (int i = 0; i < optionsTypes.length; i++) {
+			boolean b = optionsTypes[i];
+			if (b) {
+				switch (i) {
+					case 0:
+						url.append("&f_doujinshi=on");
+						break;
+					case 1:
+						url.append("&f_manga=on");
+						break;
+					case 2:
+						url.append("&f_artistcg=on");
+						break;
+					case 3:
+						url.append("&f_gamecg=on");
+						break;
+					case 4:
+						url.append("&f_western=on");
+						break;
+					case 5:
+						url.append("&f_non-h=on");
+						break;
+					case 6:
+						url.append("&f_imageset=on");
+						break;
+					case 7:
+						url.append("&f_cosplay=on");
+						break;
+					case 8:
+						url.append("&f_asianporn=on");
+						break;
+					case 9:
+						url.append("&f_misc=on");
+						break;
+				}
+			}
+		}
+		url.append("&f_sfdd=favall");
+		for (int i = 0; i < optionsSearchFields.length; i++) {
+			boolean b = optionsSearchFields[i];
+			if (b) {
+				switch (i) {
+					case 0:
+						url.append("&f_sname=on");
+						break;
+					case 1:
+						url.append("&f_stags=on&f_sdts=on");
+						break;
+					case 2:
+						url.append("&f_sdesc=on");
+						break;
+				}
+			}
+		}
+		url.append("&f_apply=Apply+Filter");
+		return url.toString();
+	}
+
+	public final static HttpURLConnection getUrlConnection(final String url) throws MalformedURLException, IOException {
 		return getUrlConnection(url, false, null);
 	}
 
-	public final static HttpURLConnection getUrlConnection(final String url,
-			final boolean post, final String output)
-			throws MalformedURLException, IOException {
+	public final static HttpURLConnection getUrlConnection(final String url, final boolean post, final String output) throws MalformedURLException, IOException {
 		URL urlObj = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
 		conn.setConnectTimeout(15000);
@@ -398,8 +421,7 @@ public class MangaDownloader implements Logger {
 		// conn.setUseCaches(false);
 		if (output != null) {
 			conn.setDoOutput(true);
-			BufferedOutputStream out = new BufferedOutputStream(
-					conn.getOutputStream());
+			BufferedOutputStream out = new BufferedOutputStream(conn.getOutputStream());
 			out.write(output.getBytes(CHARSET_UTF8));
 			out.close();
 		}
@@ -407,14 +429,6 @@ public class MangaDownloader implements Logger {
 			putConnectionHeader("Cookie", cookie.toString());
 		}
 		return conn;
-	}
-
-	public static boolean isEmptyOrNull(String text) {
-		return text == null || text.isEmpty();
-	}
-
-	public final static boolean isNotEmptyOrNull(String text) {
-		return text != null && text.length() > 0;
 	}
 
 	/**
@@ -429,27 +443,23 @@ public class MangaDownloader implements Logger {
 			}
 		}
 
-		downloadSearchResult(keyword, targetDir, new MangaDownloader());
+		downloadSearchResult(keyword, targetDir, new MangaDownloader(), new boolean[] { true, true, false, false, true, false, false, false, true, false },
+				new boolean[] { true, true, true }, 5);
 	}
 
-	public final static InputStream openUrlInputStream(final String url)
-			throws MalformedURLException, IOException {
+	public final static InputStream openUrlInputStream(final String url) throws MalformedURLException, IOException {
 		return openUrlInputStream(url, false, null);
 	}
 
-	public static final InputStream openUrlInputStream(final String url,
-			final boolean post, final String output) throws IOException {
+	public static final InputStream openUrlInputStream(final String url, final boolean post, final String output) throws IOException {
 		return getUrlConnection(url, post, output).getInputStream();
 	}
 
-	public static final void putConnectionHeader(final String key,
-			final String value) {
+	public static final void putConnectionHeader(final String key, final String value) {
 		DEFAULT_CONN_HEADERS.put(key, value);
 	}
 
-	private static void readDownloaded(File downloaded,
-			Set<String> downloadedUrls) throws FileNotFoundException,
-			IOException {
+	private static void readDownloaded(File downloaded, Set<String> downloadedUrls) throws FileNotFoundException, IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(downloaded));
 		String line;
 		while (null != (line = reader.readLine())) {
@@ -460,55 +470,10 @@ public class MangaDownloader implements Logger {
 
 	public static final void resetConnectionHeaders() {
 		DEFAULT_CONN_HEADERS.clear();
-		DEFAULT_CONN_HEADERS.put("User-Agent",
-				"Mozilla/5.0 (Windows NT " + (((int) (Math.random() * 2) + 5))
-						+ ".1) Firefox/" + (((int) (Math.random() * 8) + 3))
-						+ "." + (((int) (Math.random() * 6) + 0)) + "."
-						+ (((int) (Math.random() * 6) + 0)));
+		DEFAULT_CONN_HEADERS.put("User-Agent", "Mozilla/5.0 (Windows NT " + (((int) (Math.random() * 2) + 5)) + ".1) Firefox/" + (((int) (Math.random() * 8) + 3))
+				+ "." + (((int) (Math.random() * 6) + 0)) + "." + (((int) (Math.random() * 6) + 0)));
 		// DEFAULT_CONN_HEADERS.put("Cache-Control", "no-cache");
 		// DEFAULT_CONN_HEADERS.put("Pragma", "no-cache");
-	}
-
-	public static final String substringBetween(final String text,
-			final String start, final String end) {
-		return substringBetween(text, start, end, true);
-	}
-
-	public static final String substringBetween(final String text,
-			final String start, final String end, final boolean trim) {
-		final int nStart = text.indexOf(start);
-		final int nEnd = text.indexOf(end, nStart + start.length() + 1);
-		if (nStart != -1 && nEnd > nStart) {
-			if (trim) {
-				return text.substring(nStart + start.length(), nEnd).trim();
-			} else {
-				return text.substring(nStart + start.length(), nEnd);
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static String substringBetweenNarrow(String text, String start,
-			String end) {
-		final int nEnd = text.indexOf(end);
-		int nStart = -1;
-		if (nEnd != -1) {
-			nStart = text.lastIndexOf(start, nEnd - 1);
-		}
-		if (nStart < nEnd && nStart != -1 && nEnd != -1) {
-			return text.substring(nStart + start.length(), nEnd);
-		} else {
-			return null;
-		}
-	}
-
-	public static final void write(final InputStream in, final OutputStream out)
-			throws IOException {
-		int len;
-		while ((len = in.read(IO_BB.array())) > 0) {
-			out.write(IO_BB.array(), 0, len);
-		}
 	}
 
 	@Override
