@@ -45,29 +45,30 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 public class Main extends javax.swing.JFrame implements Logger {
-	private final static String	cfgFile				= System.getProperty("user.home") + File.separator + "exia.cfg";
+	private final static String cfgFile = System.getProperty("user.home")
+			+ File.separator + "exia.cfg";
 
-	private static final String	helpTarget		= "本地文件夹，如：C:\\temp";
+	private static final String helpTarget = "本地文件夹，如：C:\\temp";
 
-	private static final String	HELP_TEXT			= "<html>例：<br>1. 关键词：如\"chinese\" <br>--> 下载所有包含此关键词的漫画册<br>2. 漫画册网址：http://g.e-hentai.org/g/494953/7c3ec35c08/ <br>--> 下载整本漫画 <br>3. 漫画图网址：http://g.e-hentai.org/s/14b9c859ed/493328-1 <br>--> 下载从本页开始所有的漫画 </html>";
+	private static final String HELP_TEXT = "<html>例：<br>1. 关键词：如\"chinese\" <br>--> 下载所有包含此关键词的漫画册<br>2. 漫画册网址：http://g.e-hentai.org/g/494953/7c3ec35c08/ <br>--> 下载整本漫画 <br>3. 漫画图网址：http://g.e-hentai.org/s/14b9c859ed/493328-1 <br>--> 下载从本页开始所有的漫画 </html>";
 
-	private boolean[]						optionsTypes;
+	private boolean[] optionsTypes;
 
-	private boolean[]						optionsSearchFields;
+	private boolean[] optionsSearchFields;
 
-	private int									minimumStars;
+	private int minimumStars;
 
-	private String							cookie				= MangaDownloader.cookieString;
+	private String cookie = MangaDownloader.cookieString;
 
-	private String							userAgent			= MangaDownloader.userAgent;
+	private String userAgent = MangaDownloader.userAgent;
 
-	private int									sleepFactor		= MangaDownloader.sleepBase;
+	private int sleepFactor = MangaDownloader.sleepBase;
 
-	private String							searchParams	= MangaDownloader.searchParams;
+	private String searchParams = MangaDownloader.searchParams;
 
 	/**
 	 * @param args
-	 *          the command line arguments
+	 *            the command line arguments
 	 */
 	public static void main(String args[]) {
 		try {
@@ -94,28 +95,28 @@ public class Main extends javax.swing.JFrame implements Logger {
 		});
 	}
 
-	private final StyledDocument		doc;
+	private final StyledDocument doc;
 
 	// Variables declaration - do not modify
-	private javax.swing.JButton			btnDownload;
+	private javax.swing.JButton btnDownload;
 
-	private javax.swing.JButton			btnProxy;
+	private javax.swing.JButton btnProxy;
 
-	private javax.swing.JButton			btnSettings;
+	private javax.swing.JButton btnSettings;
 
-	private javax.swing.JButton			btnOptions;
+	private javax.swing.JButton btnOptions;
 
-	private javax.swing.JLabel			lblTarget;
+	private javax.swing.JLabel lblTarget;
 
-	private javax.swing.JLabel			lblUrl;
+	private javax.swing.JLabel lblUrl;
 
-	private javax.swing.JScrollPane	spLog;
+	private javax.swing.JScrollPane spLog;
 
-	private javax.swing.JTextField	tfTarget;
+	private javax.swing.JTextField tfTarget;
 
-	private javax.swing.JTextField	tfUrl;
+	private javax.swing.JTextField tfUrl;
 
-	private javax.swing.JTextPane		tpLog;
+	private javax.swing.JTextPane tpLog;
 
 	// End of variables declaration
 
@@ -215,7 +216,12 @@ public class Main extends javax.swing.JFrame implements Logger {
 					e.printStackTrace();
 				}
 			}
-			updateProxyBtn();
+			while (true) {
+				if (updateProxyBtn()) {
+					break;
+				}
+				Thread.sleep(5000);
+			}
 
 			onUrlChanged();
 			log("成功读取设置文件'" + cfgFile + "'。");
@@ -224,7 +230,7 @@ public class Main extends javax.swing.JFrame implements Logger {
 		}
 	}
 
-	private void updateProxyBtn() {
+	private boolean updateProxyBtn() {
 		btnDownload.setEnabled(false);
 		System.setProperty("useSystemProxies", "false");
 		String host = System.getProperty("http.proxyHost");
@@ -242,25 +248,29 @@ public class Main extends javax.swing.JFrame implements Logger {
 			System.setProperty("useSystemProxies", "true");
 			if (!Helper.checkUrl("http://www.baidu.com")) {
 				err("网络连接错误：没有联网");
-				return;
+				return false;
 			} else {
 				log("使用系统代理。");
 			}
 		}
 		btnDownload.setEnabled(true);
+		return true;
 	}
 
 	private void btnOptionsActionPerformed(java.awt.event.ActionEvent evt) {
 		ClosableDialog dialog = new ClosableDialog(this, "搜索参数设置", true);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setLocationRelativeTo(this);
-		OptionsPanel panel = new OptionsPanel(dialog, this.optionsTypes, this.optionsSearchFields, this.minimumStars);
+		OptionsPanel panel = new OptionsPanel(dialog, this.optionsTypes,
+				this.optionsSearchFields, this.minimumStars);
 		dialog.getContentPane().add(panel);
 		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setVisible(true);
-		System.arraycopy(panel.getTypes(), 0, this.optionsTypes, 0, this.optionsTypes.length);
-		System.arraycopy(panel.getSearchFields(), 0, this.optionsSearchFields, 0, this.optionsSearchFields.length);
+		System.arraycopy(panel.getTypes(), 0, this.optionsTypes, 0,
+				this.optionsTypes.length);
+		System.arraycopy(panel.getSearchFields(), 0, this.optionsSearchFields,
+				0, this.optionsSearchFields.length);
 		this.minimumStars = panel.getMinimumStars();
 	}
 
@@ -268,7 +278,8 @@ public class Main extends javax.swing.JFrame implements Logger {
 		ClosableDialog dialog = new ClosableDialog(this, "高级设置", true);
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setLocationRelativeTo(this);
-		SettingsPanel panel = new SettingsPanel(dialog, userAgent, cookie, sleepFactor, searchParams);
+		SettingsPanel panel = new SettingsPanel(dialog, userAgent, cookie,
+				sleepFactor, searchParams);
 		dialog.getContentPane().add(panel);
 		dialog.pack();
 		dialog.setResizable(false);
@@ -317,11 +328,16 @@ public class Main extends javax.swing.JFrame implements Logger {
 					MangaDownloader.searchParams = searchParams;
 					MangaDownloader.cookieString = cookie;
 					if (-1 == keyword.indexOf("http://")) {
-						MangaDownloader.downloadSearchResult(keyword, targetDir, Main.this, Main.this.optionsTypes, Main.this.optionsSearchFields, Main.this.minimumStars);
+						MangaDownloader.downloadSearchResult(keyword,
+								targetDir, Main.this, Main.this.optionsTypes,
+								Main.this.optionsSearchFields,
+								Main.this.minimumStars);
 					} else if (-1 == keyword.indexOf("/g/")) {
-						MangaDownloader.downloadManga(keyword, targetDir, Main.this);
+						MangaDownloader.downloadManga(keyword, targetDir,
+								Main.this);
 					} else {
-						MangaDownloader.downloadGallery(keyword, targetDir, Main.this);
+						MangaDownloader.downloadGallery(keyword, targetDir,
+								Main.this);
 					}
 				} finally {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -343,7 +359,8 @@ public class Main extends javax.swing.JFrame implements Logger {
 					Style style = doc.getStyle(StyleContext.DEFAULT_STYLE);
 					StyleConstants.setForeground(style, Color.RED);
 					doc.insertString(doc.getLength(), text + "\n", style);
-					tpLog.scrollRectToVisible(new Rectangle(0, tpLog.getHeight() - 2, 1, 1));
+					tpLog.scrollRectToVisible(new Rectangle(0, tpLog
+							.getHeight() - 2, 1, 1));
 				} catch (BadLocationException ex) {
 					System.err.println(ex.toString());
 				}
@@ -356,10 +373,14 @@ public class Main extends javax.swing.JFrame implements Logger {
 			Properties props = new Properties();
 			props.put("url", tfUrl.getText());
 			props.put("target", tfTarget.getText());
-			props.put("host", Helper.chopNull(System.getProperty("http.proxyHost")));
-			props.put("port", Helper.chopNull(System.getProperty("http.proxyPort")));
-			props.put("user", Helper.chopNull(System.getProperty("http.proxyUser")));
-			props.put("password", Helper.chopNull(System.getProperty("http.proxyPassword")));
+			props.put("host",
+					Helper.chopNull(System.getProperty("http.proxyHost")));
+			props.put("port",
+					Helper.chopNull(System.getProperty("http.proxyPort")));
+			props.put("user",
+					Helper.chopNull(System.getProperty("http.proxyUser")));
+			props.put("password",
+					Helper.chopNull(System.getProperty("http.proxyPassword")));
 			props.put("types", Helper.toString(this.optionsTypes));
 			props.put("search", Helper.toString(this.optionsSearchFields));
 			props.put("useragent", userAgent);
@@ -459,7 +480,8 @@ public class Main extends javax.swing.JFrame implements Logger {
 		tfUrl.setText("chinese");
 		tfUrl.setToolTipText(HELP_TEXT);
 
-		btnDownload.setFont(btnDownload.getFont().deriveFont(btnDownload.getFont().getStyle() | java.awt.Font.BOLD));
+		btnDownload.setFont(btnDownload.getFont().deriveFont(
+				btnDownload.getFont().getStyle() | java.awt.Font.BOLD));
 		btnDownload.setText("下载");
 		btnDownload.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -477,47 +499,102 @@ public class Main extends javax.swing.JFrame implements Logger {
 
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
-		layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(
-				layout
-						.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(
-								layout
-										.createParallelGroup(GroupLayout.Alignment.LEADING)
-										.addComponent(spLog)
-										.addGroup(
-												layout
-														.createSequentialGroup()
-														.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(lblUrl).addComponent(lblTarget))
-														.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-														.addGroup(
-																layout
-																		.createParallelGroup(GroupLayout.Alignment.LEADING)
-																		.addGroup(
-																				layout.createSequentialGroup().addComponent(tfTarget, GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
-																						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-																						.addComponent(btnProxy, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
-																						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-																						.addComponent(btnDownload, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE))
-																		.addGroup(
-																				layout.createSequentialGroup().addComponent(tfUrl).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-																						.addComponent(btnOptions, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
-																						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-																						.addComponent(btnSettings, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE))))).addContainerGap()));
-		layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(
-				layout
-						.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(
-								layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(lblUrl)
-										.addComponent(tfUrl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(btnOptions)
-										.addComponent(btnSettings))
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						.addGroup(
-								layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(lblTarget)
-										.addComponent(tfTarget, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(btnProxy)
-										.addComponent(btnDownload)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(spLog, GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE).addContainerGap()));
+		layout.setHorizontalGroup(layout
+				.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(
+						layout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(
+										layout.createParallelGroup(
+												GroupLayout.Alignment.LEADING)
+												.addComponent(spLog)
+												.addGroup(
+														layout.createSequentialGroup()
+																.addGroup(
+																		layout.createParallelGroup(
+																				GroupLayout.Alignment.LEADING)
+																				.addComponent(
+																						lblUrl)
+																				.addComponent(
+																						lblTarget))
+																.addPreferredGap(
+																		LayoutStyle.ComponentPlacement.RELATED)
+																.addGroup(
+																		layout.createParallelGroup(
+																				GroupLayout.Alignment.LEADING)
+																				.addGroup(
+																						layout.createSequentialGroup()
+																								.addComponent(
+																										tfTarget,
+																										GroupLayout.DEFAULT_SIZE,
+																										395,
+																										Short.MAX_VALUE)
+																								.addPreferredGap(
+																										LayoutStyle.ComponentPlacement.RELATED)
+																								.addComponent(
+																										btnProxy,
+																										GroupLayout.PREFERRED_SIZE,
+																										90,
+																										GroupLayout.PREFERRED_SIZE)
+																								.addPreferredGap(
+																										LayoutStyle.ComponentPlacement.RELATED)
+																								.addComponent(
+																										btnDownload,
+																										GroupLayout.PREFERRED_SIZE,
+																										90,
+																										GroupLayout.PREFERRED_SIZE))
+																				.addGroup(
+																						layout.createSequentialGroup()
+																								.addComponent(
+																										tfUrl)
+																								.addPreferredGap(
+																										LayoutStyle.ComponentPlacement.RELATED)
+																								.addComponent(
+																										btnOptions,
+																										GroupLayout.PREFERRED_SIZE,
+																										90,
+																										GroupLayout.PREFERRED_SIZE)
+																								.addPreferredGap(
+																										LayoutStyle.ComponentPlacement.RELATED)
+																								.addComponent(
+																										btnSettings,
+																										GroupLayout.PREFERRED_SIZE,
+																										90,
+																										GroupLayout.PREFERRED_SIZE)))))
+								.addContainerGap()));
+		layout.setVerticalGroup(layout
+				.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(
+						layout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(
+										layout.createParallelGroup(
+												GroupLayout.Alignment.BASELINE)
+												.addComponent(lblUrl)
+												.addComponent(
+														tfUrl,
+														GroupLayout.PREFERRED_SIZE,
+														GroupLayout.DEFAULT_SIZE,
+														GroupLayout.PREFERRED_SIZE)
+												.addComponent(btnOptions)
+												.addComponent(btnSettings))
+								.addPreferredGap(
+										LayoutStyle.ComponentPlacement.RELATED)
+								.addGroup(
+										layout.createParallelGroup(
+												GroupLayout.Alignment.BASELINE)
+												.addComponent(lblTarget)
+												.addComponent(
+														tfTarget,
+														GroupLayout.PREFERRED_SIZE,
+														GroupLayout.DEFAULT_SIZE,
+														GroupLayout.PREFERRED_SIZE)
+												.addComponent(btnProxy)
+												.addComponent(btnDownload))
+								.addPreferredGap(
+										LayoutStyle.ComponentPlacement.RELATED)
+								.addComponent(spLog, GroupLayout.DEFAULT_SIZE,
+										203, Short.MAX_VALUE).addContainerGap()));
 
 		pack();
 	}// </editor-fold>
@@ -530,7 +607,8 @@ public class Main extends javax.swing.JFrame implements Logger {
 					Style style = doc.getStyle(StyleContext.DEFAULT_STYLE);
 					StyleConstants.setForeground(style, Color.BLACK);
 					doc.insertString(doc.getLength(), text + "\n", style);
-					tpLog.scrollRectToVisible(new Rectangle(0, tpLog.getHeight() - 2, 1, 1));
+					tpLog.scrollRectToVisible(new Rectangle(0, tpLog
+							.getHeight() - 2, 1, 1));
 				} catch (BadLocationException ex) {
 					System.err.println(ex.toString());
 				}
