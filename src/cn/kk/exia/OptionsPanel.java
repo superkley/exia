@@ -20,239 +20,232 @@
  */
 package cn.kk.exia;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JRootPane;
-import javax.swing.KeyStroke;
-
 public class OptionsPanel extends javax.swing.JPanel {
-	private static final long	serialVersionUID	= 1019505904452333279L;
+  private static final long serialVersionUID = 1019505904452333279L;
 
-	private JDialog						parent;
+  public boolean[] getTypes() {
+    return new boolean[] { this.chkDouhinshi.isSelected(), this.chkManga.isSelected(), this.chkArtist.isSelected(), this.chkGame.isSelected(),
+        this.chkWestern.isSelected(), this.chkNon.isSelected(), this.chkImageSet.isSelected(), this.chkCosplay.isSelected(), this.chkAsian.isSelected(),
+        this.chkMisc.isSelected() };
+  }
 
-	public boolean[] getTypes() {
-		return new boolean[] { chkDouhinshi.isSelected(), chkManga.isSelected(), chkArtist.isSelected(), chkGame.isSelected(), chkWestern.isSelected(),
-				chkNon.isSelected(), chkImageSet.isSelected(), chkCosplay.isSelected(), chkAsian.isSelected(), chkMisc.isSelected() };
-	}
+  public boolean[] getSearchFields() {
+    return new boolean[] { this.chkSearchName.isSelected(), this.chkSearchTags.isSelected(), this.chkSearchDescription.isSelected() };
+  }
 
-	public boolean[] getSearchFields() {
-		return new boolean[] { chkSearchName.isSelected(), chkSearchTags.isSelected(), chkSearchDescription.isSelected() };
-	}
+  public int getMinimumStars() {
+    return this.cbStars.getSelectedIndex() + 1;
+  }
 
-	public int getMinimumStars() {
-		return cbStars.getSelectedIndex() + 1;
-	}
-  
-	/**
-	 * Creates new form OptionsPanel
-	 * 
-	 * @param minimumStars
-	 * @param optionsSearchFields
-	 * @param optionsTypes
-	 */
-	public OptionsPanel(JDialog dialog, boolean[] optionsTypes, boolean[] optionsSearchFields, int minimumStars) {
-		this.parent = dialog;
-		initComponents();
-		if (minimumStars < 1 || minimumStars > 5) {
-			minimumStars = 1;
-		}
-		cbStars.setSelectedIndex(minimumStars - 1);
-		for (int i = 0; i < optionsSearchFields.length; i++) {
-			boolean selected = optionsSearchFields[i];
-			switch (i) {
-				case 0:
-					chkSearchName.setSelected(selected);
-					break;
-				case 1:
-					chkSearchTags.setSelected(selected);
-					break;
-				case 2:
-					chkSearchDescription.setSelected(selected);
-					break;
-			}
-		}
-		for (int i = 0; i < optionsTypes.length; i++) {
-			boolean selected = optionsTypes[i];
-			switch (i) {
-				case 0:
-					chkDouhinshi.setSelected(selected);
-					break;
-				case 1:
-					chkManga.setSelected(selected);
-					break;
-				case 2:
-					chkArtist.setSelected(selected);
-					break;
-				case 3:
-					chkGame.setSelected(selected);
-					break;
-				case 4:
-					chkWestern.setSelected(selected);
-					break;
-				case 5:
-					chkNon.setSelected(selected);
-					break;
-				case 6:
-					chkImageSet.setSelected(selected);
-					break;
-				case 7:
-					chkCosplay.setSelected(selected);
-					break;
-				case 8:
-					chkAsian.setSelected(selected);
-					break;
-				case 9:
-					chkMisc.setSelected(selected);
-					break;
-			}
-		}
-	}
+  /**
+   * Creates new form OptionsPanel
+   * 
+   * @param minimumStars
+   * @param optionsSearchFields
+   * @param optionsTypes
+   */
+  public OptionsPanel(final boolean[] optionsTypes, final boolean[] optionsSearchFields, final int minimumStars) {
+    this.initComponents();
+    int minStars = minimumStars;
+    if ((minStars < 1) || (minStars > 5)) {
+      minStars = 1;
+    }
+    this.cbStars.setSelectedIndex(minStars - 1);
+    for (int i = 0; i < optionsSearchFields.length; i++) {
+      final boolean selected = optionsSearchFields[i];
+      switch (i) {
+        case 0:
+          this.chkSearchName.setSelected(selected);
+          break;
+        case 1:
+          this.chkSearchTags.setSelected(selected);
+          break;
+        case 2:
+          this.chkSearchDescription.setSelected(selected);
+          break;
+        default:
+          break;
+      }
+    }
+    for (int i = 0; i < optionsTypes.length; i++) {
+      final boolean selected = optionsTypes[i];
+      switch (i) {
+        case 0:
+          this.chkDouhinshi.setSelected(selected);
+          break;
+        case 1:
+          this.chkManga.setSelected(selected);
+          break;
+        case 2:
+          this.chkArtist.setSelected(selected);
+          break;
+        case 3:
+          this.chkGame.setSelected(selected);
+          break;
+        case 4:
+          this.chkWestern.setSelected(selected);
+          break;
+        case 5:
+          this.chkNon.setSelected(selected);
+          break;
+        case 6:
+          this.chkImageSet.setSelected(selected);
+          break;
+        case 7:
+          this.chkCosplay.setSelected(selected);
+          break;
+        case 8:
+          this.chkAsian.setSelected(selected);
+          break;
+        case 9:
+          this.chkMisc.setSelected(selected);
+          break;
+        default:
+          break;
+      }
+    }
+  }
 
-	/**
-	 * This method is called from within the constructor to initialize the form.
-	 * WARNING: Do NOT modify this code. The content of this method is always
-	 * regenerated by the Form Editor.
-	 */
-	@SuppressWarnings("unchecked")
-	// <editor-fold defaultstate="collapsed" desc="Generated Code">
-	private void initComponents() {
+  /**
+   * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">
+  private void initComponents() {
 
-		chkDouhinshi = new javax.swing.JCheckBox();
-		chkManga = new javax.swing.JCheckBox();
-		chkArtist = new javax.swing.JCheckBox();
-		chkGame = new javax.swing.JCheckBox();
-		chkWestern = new javax.swing.JCheckBox();
-		chkNon = new javax.swing.JCheckBox();
-		chkImageSet = new javax.swing.JCheckBox();
-		chkCosplay = new javax.swing.JCheckBox();
-		chkAsian = new javax.swing.JCheckBox();
-		chkMisc = new javax.swing.JCheckBox();
-		cbStars = new javax.swing.JComboBox();
-		chkSearchName = new javax.swing.JCheckBox();
-		chkSearchTags = new javax.swing.JCheckBox();
-		chkSearchDescription = new javax.swing.JCheckBox();
-		jLabel1 = new javax.swing.JLabel();
+    this.chkDouhinshi = new javax.swing.JCheckBox();
+    this.chkManga = new javax.swing.JCheckBox();
+    this.chkArtist = new javax.swing.JCheckBox();
+    this.chkGame = new javax.swing.JCheckBox();
+    this.chkWestern = new javax.swing.JCheckBox();
+    this.chkNon = new javax.swing.JCheckBox();
+    this.chkImageSet = new javax.swing.JCheckBox();
+    this.chkCosplay = new javax.swing.JCheckBox();
+    this.chkAsian = new javax.swing.JCheckBox();
+    this.chkMisc = new javax.swing.JCheckBox();
+    this.cbStars = new javax.swing.JComboBox();
+    this.chkSearchName = new javax.swing.JCheckBox();
+    this.chkSearchTags = new javax.swing.JCheckBox();
+    this.chkSearchDescription = new javax.swing.JCheckBox();
+    this.jLabel1 = new javax.swing.JLabel();
 
-		chkDouhinshi.setSelected(true);
-		chkDouhinshi.setText("同人志");
+    this.chkDouhinshi.setSelected(true);
+    this.chkDouhinshi.setText("同人志");
 
-		chkManga.setSelected(true);
-		chkManga.setText("漫画");
+    this.chkManga.setSelected(true);
+    this.chkManga.setText("漫画");
 
-		chkArtist.setText("艺术创作");
+    this.chkArtist.setText("艺术创作");
 
-		chkGame.setText("游戏");
+    this.chkGame.setText("游戏");
 
-		chkWestern.setSelected(true);
-		chkWestern.setText("欧美");
+    this.chkWestern.setSelected(true);
+    this.chkWestern.setText("欧美");
 
-		chkNon.setText("无色情");
+    this.chkNon.setText("无色情");
 
-		chkImageSet.setText("图片");
+    this.chkImageSet.setText("图片");
 
-		chkCosplay.setText("角色扮演");
+    this.chkCosplay.setText("角色扮演");
 
-		chkAsian.setSelected(true);
-		chkAsian.setText("亚洲");
+    this.chkAsian.setSelected(true);
+    this.chkAsian.setText("亚洲");
 
-		chkMisc.setText("其它");
+    this.chkMisc.setText("其它");
 
-		cbStars.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1星以上", "2星以上", "3星以上", "4星以上", "5星" }));
-		cbStars.setSelectedIndex(4);
+    this.cbStars.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1星以上", "2星以上", "3星以上", "4星以上", "5星" }));
+    this.cbStars.setSelectedIndex(4);
 
-		chkSearchName.setSelected(true);
-		chkSearchName.setText("漫画名");
+    this.chkSearchName.setSelected(true);
+    this.chkSearchName.setText("漫画名");
 
-		chkSearchTags.setSelected(true);
-		chkSearchTags.setText("标签");
+    this.chkSearchTags.setSelected(true);
+    this.chkSearchTags.setText("标签");
 
-		chkSearchDescription.setSelected(true);
-		chkSearchDescription.setText("描述");
+    this.chkSearchDescription.setSelected(true);
+    this.chkSearchDescription.setText("描述");
 
-		jLabel1.setText("范围：");
+    this.jLabel1.setText("范围：");
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-		this.setLayout(layout);
-		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout
-						.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(
-								layout
-										.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-										.addGroup(
-												layout
-														.createSequentialGroup()
-														.addComponent(cbStars, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-														.addComponent(jLabel1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkSearchName)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkSearchTags)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkSearchDescription))
-										.addGroup(
-												layout.createSequentialGroup().addComponent(chkDouhinshi).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-														.addComponent(chkManga).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkArtist)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkGame)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkWestern))
-										.addGroup(
-												layout.createSequentialGroup().addComponent(chkNon).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-														.addComponent(chkImageSet).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkCosplay)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkAsian)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(chkMisc)))
-						.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						layout
-								.createSequentialGroup()
-								.addContainerGap()
-								.addGroup(
-										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(chkDouhinshi).addComponent(chkManga)
-												.addComponent(chkArtist).addComponent(chkGame).addComponent(chkWestern))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(chkNon).addComponent(chkImageSet)
-												.addComponent(chkCosplay).addComponent(chkAsian).addComponent(chkMisc))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(cbStars, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(chkSearchName).addComponent(chkSearchTags).addComponent(chkSearchDescription)
-												.addComponent(jLabel1)).addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-	}// </editor-fold>
-		// Variables declaration - do not modify
+    final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+    this.setLayout(layout);
+    layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+        layout
+            .createSequentialGroup()
+            .addContainerGap()
+            .addGroup(
+                layout
+                    .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(
+                        layout
+                            .createSequentialGroup()
+                            .addComponent(this.cbStars, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(this.jLabel1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkSearchName)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkSearchTags)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkSearchDescription))
+                    .addGroup(
+                        layout.createSequentialGroup().addComponent(this.chkDouhinshi).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(this.chkManga).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkArtist)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkGame)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkWestern))
+                    .addGroup(
+                        layout.createSequentialGroup().addComponent(this.chkNon).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(this.chkImageSet).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkCosplay)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkAsian)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(this.chkMisc)))
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+    layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(
+            layout
+                .createSequentialGroup()
+                .addContainerGap()
+                .addGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(this.chkDouhinshi).addComponent(this.chkManga)
+                        .addComponent(this.chkArtist).addComponent(this.chkGame).addComponent(this.chkWestern))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(this.chkNon).addComponent(this.chkImageSet)
+                        .addComponent(this.chkCosplay).addComponent(this.chkAsian).addComponent(this.chkMisc))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(
+                    layout
+                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(this.cbStars, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                            javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(this.chkSearchName).addComponent(this.chkSearchTags)
+                        .addComponent(this.chkSearchDescription).addComponent(this.jLabel1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+  }// </editor-fold>
+   // Variables declaration - do not modify
 
-	private javax.swing.JComboBox	cbStars;
+  private javax.swing.JComboBox cbStars;
 
-	private javax.swing.JCheckBox	chkArtist;
+  private javax.swing.JCheckBox chkArtist;
 
-	private javax.swing.JCheckBox	chkAsian;
+  private javax.swing.JCheckBox chkAsian;
 
-	private javax.swing.JCheckBox	chkCosplay;
+  private javax.swing.JCheckBox chkCosplay;
 
-	private javax.swing.JCheckBox	chkDouhinshi;
+  private javax.swing.JCheckBox chkDouhinshi;
 
-	private javax.swing.JCheckBox	chkGame;
+  private javax.swing.JCheckBox chkGame;
 
-	private javax.swing.JCheckBox	chkImageSet;
+  private javax.swing.JCheckBox chkImageSet;
 
-	private javax.swing.JCheckBox	chkManga;
+  private javax.swing.JCheckBox chkManga;
 
-	private javax.swing.JCheckBox	chkMisc;
+  private javax.swing.JCheckBox chkMisc;
 
-	private javax.swing.JCheckBox	chkNon;
+  private javax.swing.JCheckBox chkNon;
 
-	private javax.swing.JCheckBox	chkSearchDescription;
+  private javax.swing.JCheckBox chkSearchDescription;
 
-	private javax.swing.JCheckBox	chkSearchName;
+  private javax.swing.JCheckBox chkSearchName;
 
-	private javax.swing.JCheckBox	chkSearchTags;
+  private javax.swing.JCheckBox chkSearchTags;
 
-	private javax.swing.JCheckBox	chkWestern;
+  private javax.swing.JCheckBox chkWestern;
 
-	private javax.swing.JLabel		jLabel1;
-	// End of variables declaration
+  private javax.swing.JLabel    jLabel1;
+  // End of variables declaration
 }
